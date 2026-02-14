@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Meter Dashboard</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+    }
+
+    h2 {
+      margin-bottom: 15px;
+    }
+
+    .box {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    input, select, button {
+      padding: 8px;
+      margin: 5px;
+      font-size: 14px;
+    }
+
+    button {
+      cursor: pointer;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 15px;
+    }
+
+    button:hover {
+      background: #125ea9;
+    }
+
+    /* ===== Table Container ===== */
+.table-box {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 10px 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+/* ===== Table ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+/* ===== Header ===== */
+thead {
+  background: #f8fafc;
+}
+
+th {
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #334155;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* ===== Rows ===== */
+tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.2s;
+}
+
+tbody tr:hover {
+  background: #f9fbff;
+}
+
+/* ===== Cells ===== */
+td {
+  padding: 12px 15px;
+  color: #475569;
+  border: none;
+}
+
+/* ===== Center Text ===== */
+.center {
+  text-align: center;
+  color: #64748b;
+}
+
+/* ===== Badge (Optional) ===== */
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 20px;
+}
+
+.badge-green {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-blue {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+  </style>
+</head>
+<body>
+
+  <h2>📊 Meter Live Data</h2>
+
+  <!-- Controls -->
+  <div class="box">
+
+    <select id="type">
+      <option value="daily">Daily</option>
+      <option value="monthly">Monthly</option>
+      <option value="yearly">Yearly</option>
+    </select>
+
+    <input id="dateInput">
+
+    <button onclick="loadData()">Fetch Data</button>
+
+  </div>
+
+
+  <!-- Table -->
+  <div class="box table-box">
+
+    <h3>Latest Record</h3>
+
+    <table id="resultTable">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td colspan="2" class="center">No Data</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+
+
+<script>
+
+  // 🔴 Change IP if using another laptop
+  const BASE_URL = "http://192.168.1.24:3000";
+
+
+  const typeSelect = document.getElementById("type");
+  const dateInput = document.getElementById("dateInput");
+  const tableBody = document.querySelector("#resultTable tbody");
+
+
+  // ================= INPUT TYPE CONTROL =================
+
+  function updateInputType() {
+
+    const type = typeSelect.value;
+
+    if (type === "daily") {
+      dateInput.type = "date";
+      dateInput.value = "";
+    }
+
+    if (type === "monthly") {
+      dateInput.type = "month";
+      dateInput.value = "";
+    }
+
+    if (type === "yearly") {
+      dateInput.type = "number";
+      dateInput.placeholder = "Enter Year (2026)";
+      dateInput.value = "";
+    }
+  }
+
+  updateInputType();
+
+  typeSelect.addEventListener("change", updateInputType);
+
+
+
+  // ================= LOAD DATA =================
+
+  async function loadData() {
+
+    const type = typeSelect.value;
+    const inputVal = dateInput.value;
+
+    if (!inputVal) {
+      alert("Please select input!");
+      return;
+    }
+
+    let url = "";
+
+
+    // Build API URL
+    if (type === "daily") {
+      url = `/api/data/daily?date=${inputVal}`;
+    }
+
+    if (type === "monthly") {
+      const [year, month] = inputVal.split("-");
+      url = `/api/data/monthly?year=${year}&month=${month}`;
+    }
+
+    if (type === "yearly") {
+      url = `/api/data/yearly?year=${inputVal}`;
+    }
+
+
+    try {
+
+      // Show loading
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="2" class="center">Loading...</td>
+        </tr>
+      `;
+
+
+      const res = await fetch(BASE_URL + url);
+
+      if (!res.ok) {
+        throw new Error("Server Error: " + res.status);
+      }
+
+      const data = await res.json();
+
+
+      tableBody.innerHTML = "";
+
+
+      if (!data.length) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="2" class="center">No Data Found</td>
+          </tr>
+        `;
+        return;
+      }
+
+
+      // ✅ Latest Record
+      const latest = data[data.length - 1];
+
+
+      // ========== BASIC INFO ==========
+
+      addRow("Device Name", latest.DeviceName || "-");
+      addRow("Timestamp", formatDate(latest.timestamp));
+
+
+      // ========== VALUES OBJECT ==========
+
+      if (latest.values && typeof latest.values === "object") {
+
+        for (const key in latest.values) {
+
+          addRow(key, latest.values[key]);
+
+        }
+
+      } else {
+
+        addRow("Values", "No values found");
+
+      }
+
+
+    } catch (err) {
+
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="2" class="center">❌ ${err.message}</td>
+        </tr>
+      `;
+
+    }
+  }
+
+
+  // ================= HELPER FUNCTIONS =================
+
+  function addRow(param, value) {
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${param}</td>
+      <td>${value}</td>
+    `;
+
+    tableBody.appendChild(row);
+  }
+
+
+  function formatDate(dateStr) {
+
+    if (!dateStr) return "-";
+
+    const d = new Date(dateStr);
+
+    return d.toLocaleString();
+  }
+
+</script>
+
+</body>
+</html>
