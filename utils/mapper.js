@@ -11,9 +11,9 @@ function mapValues(raw) {
 
   return {
 
-     // BLOCK 1
+     // BLOCK 1  4096 TO 4160
     // reg44096: b1[0],
-    PHASE3_SYSTEM_VOLTAGE: toUInt32Scaled(b1[0]),
+    PHASE3_SYSTEM_VOLTAGE: toUInt32Scaled(b1[0], b1[1]),
     PHASE_VOLTAGE_L1_N: toUInt32Scaled(b1[2],b1[3]),
     PHASE_VOLTAGE_L2_N: toUInt32Scaled(b1[4],b1[5]),
     PHASE_VOLTAGE_L3_N: toUInt32Scaled(b1[6],b1[7]),
@@ -44,21 +44,21 @@ function mapValues(raw) {
     REACTIVE_POWER_L1: toInt32(b1[56],b1[57]),
     REACTIVE_POWER_L2: toInt32(b1[58],b1[59]),
     REACTIVE_POWER_L3: toInt32(b1[60],b1[61]),
-    PHASE3_SYS_ACTIVE_ENERGY: toUInt32Scaled(b1[62],b1[63]),
+    PHASE3_SYS_ACTIVE_ENERGY: toUInt32Scaled(b1[62], b1[63],100),
     PHASE3_SYS_REACTIVE_ENERGY: toUInt32Scaled(b1[64],b1[65]),
 
-    // BLOCK 2
+    // BLOCK 2   4166
     FREQUENCY: toUInt32Scaled(b2[0],b2[1]),
 
-    // BLOCK 3
+    // BLOCK 3   4192 TO 4200
     MAX_LINE_CURRENT_L1: toUInt32Scaled(b3[0],b3[1]),
     MAX_LINE_CURRENT_L2: toUInt32Scaled(b3[2],b3[3]),
     MAX_LINE_CURRENT_L3: toUInt32Scaled(b3[4],b3[5]),
     MAX_3PHASE_SYS_ACTIVE_POWER: toInt32(b3[6],b3[7]),
     MAX_3PHASE_SYS_APPARENT_POWER: toUInt32Scaled(b3[8],b3[9]),
 
-    //BLOCK 4
-    PHASE3_SYS_ACTIVE_POWER_15_AVER: toInt32(b4[0],b4[1]),
+    //BLOCK 4   4208 TO 4250
+    PHASE3_SYS_ACTIVE_POWER_15_AVER: toInt32(b4[0],b4[1] ,1000),
     PHASE3_SYS_APPARENT_POWER_15_AVER: toUInt32Scaled(b4[2],b4[3]),
     ACTIVE_ENERGY_L1: toUInt32Scaled(b4[4],b4[5]),
     ACTIVE_ENERGY_L2: toUInt32Scaled(b4[6],b4[7]),
@@ -82,7 +82,7 @@ function mapValues(raw) {
     MAX_APPARERENT_POWER_15_AVER_L3: toUInt32Scaled(b4[42],b4[43]),
 
 
-    //BLOCK 5
+    //BLOCK 5  4262 TO 4292
     PHASE3_SYS_APPARENT_ENERGY: toUInt32Scaled(b5[0],b5[1]),
     APPARENT_ENERGY_L1: toUInt32Scaled(b5[2],b5[3]),
     APPARENT_ENERGY_L2: toUInt32Scaled(b5[4],b5[5]),
@@ -101,7 +101,7 @@ function mapValues(raw) {
     GENERATED_APPARENT_ENERGY_L3: toUInt32Scaled(b5[30],b5[31]),
 
 
-    //BLOCK 6
+    //BLOCK 6    4152 TO 4154
     CURRENT_TRANSFORMER_PRIMARY_CT: toUInt32Scaled(b6[0],b6[1]),
     VOLTAGE_TRANSFORMER_PRIMARY_VT: toUInt32Scaled(b6[2],b6[3]),
   };

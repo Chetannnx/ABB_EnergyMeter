@@ -2,6 +2,7 @@
   const http = require("http");
   const socketIO = require("socket.io");
   const path = require("path");
+  const cors = require ("cors")
 
   const mongo = require("./services/mongo.service"); // ✅ ADD THIS
 
@@ -11,15 +12,27 @@
 
   const app = express();
   const server = http.createServer(app);
-  const io = socketIO(server);
+  // const io = socketIO(server);
 
+  const io = socketIO(server, {
+  cors: {
+    origin: "http://192.168.1.96:3000",
+    credentials: true,
+  },
+});
+
+  app.use(
+    cors({
+      origin: "http://192.168.1.96:3000",
+      credentials: true,
+    })
+  )
   app.use(express.static("public"));
 
   app.use("/api/data", dataRoutes);
   app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "test.html"));
   });
-
 
 
   socketHandler(io);
