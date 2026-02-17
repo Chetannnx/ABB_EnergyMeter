@@ -1,27 +1,43 @@
 const ModbusRTU = require("modbus-serial");
 const config = require("../config/modbus");
 
-let client;
+// let client;
 
-async function connect() {
+// async function connect() {
 
-  if (client?.isOpen) return client;
+//   if (client?.isOpen) return client;
 
-  client = new ModbusRTU();
+//   client = new ModbusRTU();
 
-  await client.connectTCP(config.device.ip, {
+//   await client.connectTCP(config.device.ip, {
+//     port: config.port
+//   });
+
+//   client.setID(config.device.unitId);
+//   client.setTimeout(3000);
+
+//   console.log("✅ Modbus Connected");
+
+//   return client;
+// }
+
+async function connect(device) {
+
+  const client = new ModbusRTU();
+
+  await client.connectTCP(device.ip, {
     port: config.port
   });
 
-  client.setID(config.device.unitId);
+  client.setID(device.unitId);
   client.setTimeout(3000);
 
-  console.log("✅ Modbus Connected");
+  console.log(`✅ Modbus Connected -> ${device.name}`);
 
   return client;
 }
 
-async function readChunks(start, count, chunk = 20) {
+async function readChunks(client, start, count, chunk = 20) {
 
   const result = [];
 
