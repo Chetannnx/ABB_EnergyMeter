@@ -288,6 +288,39 @@ async function poll(io) {
         } else {
           Data.POWER_AVG = 0;
         }
+         // ===============================
+        // ✅ Total ENEGERGY
+        // ===============================
+        if (
+          Data.PHASE3_SYS_ACTIVE_ENERGY != null
+        ) {
+          Data.TOTAL_ENERGY = Number(
+            (
+              (Data.PHASE3_SYS_ACTIVE_ENERGY * 100) / 1000
+            ).toFixed(2)
+          );
+        } else {
+          Data.TOTAL_ENERGY = 0;
+        }
+
+        // ===============================
+        // ✅ TOTAL POWER
+        // ===============================
+        if (
+          Data.ACTIVE_POWER_L1 != null &&
+          Data.ACTIVE_POWER_L2 != null &&
+          Data.ACTIVE_POWER_L3 != null
+        ) {
+          Data.TOTAL_POWER = Number(
+            (
+              (Data.ACTIVE_POWER_L1 +
+                Data.ACTIVE_POWER_L2 +
+                Data.ACTIVE_POWER_L3) / 1000
+            ).toFixed(2)
+          );
+        } else {
+          Data.TOTAL_POWER = 0; //Kw 
+        }
 
         // find device from DB
         const dbDevice = await mongo.getDeviceByIP(device.ip);

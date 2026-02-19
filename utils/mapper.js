@@ -44,7 +44,7 @@ function mapValues(raw) {
     REACTIVE_POWER_L1: toInt32(b1[56],b1[57]),
     REACTIVE_POWER_L2: toInt32(b1[58],b1[59]),
     REACTIVE_POWER_L3: toInt32(b1[60],b1[61]),
-    PHASE3_SYS_ACTIVE_ENERGY: toUInt32Scaled(b1[62], b1[63],100),
+    PHASE3_SYS_ACTIVE_ENERGY: toUInt32Scaled(b1[62], b1[63]),
     PHASE3_SYS_REACTIVE_ENERGY: toUInt32Scaled(b1[64],b1[65]),
 
     // BLOCK 2   4166
