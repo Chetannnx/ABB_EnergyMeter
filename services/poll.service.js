@@ -232,6 +232,63 @@ async function poll(io) {
 
         const Data = mapValues(rawData);
 
+        // ===============================
+        // ✅ VOLTAGE AVERAGE
+        // ===============================
+        if (
+          Data.PHASE_VOLTAGE_L1_N != null &&
+          Data.PHASE_VOLTAGE_L2_N != null &&
+          Data.PHASE_VOLTAGE_L3_N != null
+        ) {
+          Data.VOLTAGE_AVG = Number(
+            (
+              (Data.PHASE_VOLTAGE_L1_N +
+                Data.PHASE_VOLTAGE_L2_N +
+                Data.PHASE_VOLTAGE_L3_N) / 3
+            ).toFixed(2)
+          );
+        } else {
+          Data.VOLTAGE_AVG = 0;
+        }
+
+        // ===============================
+        // ✅ CURRENT AVERAGE
+        // ===============================
+        if (
+          Data.LINE_CURRENT_L1 != null &&
+          Data.LINE_CURRENT_L2 != null &&
+          Data.LINE_CURRENT_L3 != null
+        ) {
+          Data.CURRENT_AVG = Number(
+            (
+              (Data.LINE_CURRENT_L1 +
+                Data.LINE_CURRENT_L2 +
+                Data.LINE_CURRENT_L3) / 3
+            ).toFixed(2)
+          );
+        } else {
+          Data.CURRENT_AVG = 0;
+        }
+
+        // ===============================
+        // ✅ POWER FACTOR AVERAGE
+        // ===============================
+        if (
+          Data.POWER_FACTOR_L1 != null &&
+          Data.POWER_FACTOR_L2 != null &&
+          Data.POWER_FACTOR_L3 != null
+        ) {
+          Data.POWER_AVG = Number(
+            (
+              (Data.POWER_FACTOR_L1 +
+                Data.POWER_FACTOR_L2 +
+                Data.POWER_FACTOR_L3) / 3
+            ).toFixed(2)
+          );
+        } else {
+          Data.POWER_AVG = 0;
+        }
+
         // find device from DB
         const dbDevice = await mongo.getDeviceByIP(device.ip);
 
